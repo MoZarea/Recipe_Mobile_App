@@ -10,7 +10,9 @@ plugins {
 android {
     namespace 'com.example.recipe_app'
     compileSdk 33
-
+    buildFeatures {
+        viewBinding = true
+    }
     defaultConfig {
         applicationId "com.example.recipe_app"
         minSdk 24
@@ -77,3 +79,4 @@ dependencies {
 kapt {
     correctErrorTypes true
 }
+

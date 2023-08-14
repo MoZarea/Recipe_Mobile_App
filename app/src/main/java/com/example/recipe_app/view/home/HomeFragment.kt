@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.recipe_app.R
+import com.example.recipe_app.databinding.FragmentHomeBinding
 import com.example.recipe_app.model.MealX
 import com.example.recipe_app.utils.CurrentUser
 import com.example.recipe_app.utils.GreenSnackBar
@@ -31,19 +32,9 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 
 class HomeFragment : Fragment(), OnClickListener {
-
+    private var homeFragmentBinding: FragmentHomeBinding? = null
     private val homeViewModel: HomeMealsViewModel by viewModels()
-
-
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var nameRandom: TextView
-    private lateinit var catRandom: TextView
-    private lateinit var areaRandom: TextView
-    private lateinit var constrainRandom: ConstraintLayout
-    private lateinit var imgRandom: ImageView
-    private lateinit var shimmerFrameLayout: ShimmerFrameLayout
     private lateinit var recyclerAdapter: HomeAdapter
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,13 +45,8 @@ class HomeFragment : Fragment(), OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        nameRandom = view.findViewById(R.id.name_random)
-        catRandom = view.findViewById(R.id.cat_random)
-        areaRandom = view.findViewById(R.id.area_random)
-        constrainRandom = view.findViewById(R.id.constrain_random)
-        imgRandom = view.findViewById(R.id.img_random)
-        shimmerFrameLayout = view.findViewById(R.id.shimmer_layout)
-
+        val binding = FragmentHomeBinding.bind(view)
+        homeFragmentBinding = binding
 
         val userId = CurrentUser.getCurrentUser(requireActivity())
         if (isInternetAvailable(requireActivity())) {
@@ -70,10 +56,9 @@ class HomeFragment : Fragment(), OnClickListener {
             showSnackBarWithDismiss(view, "No Internet Connection")
         }
 
-        recyclerView = view.findViewById(R.id.HomeRecyclerView)
         recyclerAdapter = HomeAdapter(this)
-        recyclerView.adapter = recyclerAdapter
-        recyclerView.layoutManager =
+        binding.HomeRecyclerView.adapter = recyclerAdapter
+        binding.HomeRecyclerView.layoutManager =
             GridLayoutManager(requireActivity(), 2, GridLayoutManager.HORIZONTAL, false)
 
         homeViewModel.listOfMeals.observe(viewLifecycleOwner) { meals ->
@@ -81,18 +66,18 @@ class HomeFragment : Fragment(), OnClickListener {
         }
 
         homeViewModel.randomMeal.observe(viewLifecycleOwner) { randomMeal ->
-            nameRandom.text = randomMeal.strMeal
-            catRandom.text = randomMeal.strCategory.plus(" |")
-            areaRandom.text = randomMeal.strArea
+            binding.nameRandom.text = randomMeal.strMeal
+            binding.catRandom.text = randomMeal.strCategory.plus(" |")
+            binding.areaRandom.text = randomMeal.strArea
             Glide.with(this)
                 .load(randomMeal.strMealThumb)
-                .into(imgRandom)
-            shimmerFrameLayout.stopShimmer()
-            shimmerFrameLayout.visibility = View.GONE
-            constrainRandom.visibility = View.VISIBLE
-            recyclerView.visibility = View.VISIBLE
+                .into(binding.imgRandom)
+            binding.shimmerLayout.stopShimmer()
+            binding.shimmerLayout.visibility = View.GONE
+            binding.constrainRandom.visibility = View.VISIBLE
+            binding.HomeRecyclerView.visibility = View.VISIBLE
 
-            constrainRandom.setOnClickListener {
+            binding.constrainRandom.setOnClickListener {
                 findNavController().navigate(
                     HomeFragmentDirections.actionHomeFragmentToDetailsFragment(
                         randomMeal
@@ -135,7 +120,11 @@ class HomeFragment : Fragment(), OnClickListener {
             val dialog = builder.create()
             dialog.show()
         }
+    }
 
+    override fun onDestroy() {
+        homeFragmentBinding = null
+        super.onDestroy()
     }
 
 

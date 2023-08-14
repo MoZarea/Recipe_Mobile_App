@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.recipe_app.R
+import com.example.recipe_app.databinding.FragmentLoginBinding
 import com.example.recipe_app.model.PersonInfo
 import com.example.recipe_app.utils.GreenSnackBar
 import com.example.recipe_app.viewModels.AuthViewModel
@@ -20,37 +21,25 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
-
-    private lateinit var btntosignup: TextView
-    private lateinit var etEmailLogin: TextInputEditText
-    private lateinit var etPasswordLogin: TextInputEditText
-    private lateinit var etTxtLayoutEmail:TextInputLayout
-    private lateinit var etTxtLayoutPassword:TextInputLayout
-    private lateinit var btnlogin: Button
-
+    private var loginFragmentBinding: FragmentLoginBinding? = null
     private val viewModel: AuthViewModel by viewModels()
-
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_login, container, false)
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//
+        val binding=FragmentLoginBinding.bind(view)
+        loginFragmentBinding=binding
 
-        etEmailLogin = view.findViewById(R.id.editText_email)
-        etPasswordLogin = view.findViewById(R.id.et_password)
-        btnlogin = view.findViewById(R.id.btn_create_account)
-        etTxtLayoutEmail = view.findViewById(R.id.editTextLayout_email)
-        etTxtLayoutPassword = view.findViewById(R.id.et_layout_password)
-
-
+        val etEmailLogin = binding.editTextEmail
+        val etPasswordLogin = binding.etPassword
+        val btnlogin = binding.btnCreateAccount
+        val etTxtLayoutEmail = binding.editTextLayoutEmail
+        val etTxtLayoutPassword = binding.etLayoutPassword
 
         btnlogin.setOnClickListener {
 
@@ -122,11 +111,15 @@ class LoginFragment : Fragment() {
             }
 
         }
-        btntosignup = view.findViewById(R.id.textview_createAccount)
-        btntosignup.setOnClickListener {
+        binding.textViewCreateAccount.setOnClickListener {
             val action = LoginFragmentDirections.actionLoginFragmentToSignUpFragment()
             findNavController().navigate(action)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        loginFragmentBinding=null
     }
 
 

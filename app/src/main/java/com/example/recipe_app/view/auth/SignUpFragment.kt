@@ -5,33 +5,21 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.recipe_app.R
+import com.example.recipe_app.databinding.FragmentSignUpBinding
 import com.example.recipe_app.model.PersonInfo
 import com.example.recipe_app.utils.GreenSnackBar
 import com.example.recipe_app.viewModels.AuthViewModel
-import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class SignUpFragment : Fragment() {
-    private lateinit var etName: TextInputEditText
-    private lateinit var etEmail: TextInputEditText
-    private lateinit var etPassword: TextInputEditText
-    private lateinit var btnSignup: Button
-    private lateinit var etLayoutEmail: TextInputLayout
-    private lateinit var etLayoutName: TextInputLayout
-    private lateinit var etLayoutPassword: TextInputLayout
+    private var signUpFragmentBinding: FragmentSignUpBinding? = null
     private val viewModel: AuthViewModel by viewModels()
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -39,17 +27,18 @@ class SignUpFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_sign_up, container, false)
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val binding=FragmentSignUpBinding.bind(view)
+        signUpFragmentBinding= binding
 
-        etName = view.findViewById(R.id.et_name_signup)
-        etEmail = view.findViewById(R.id.et_email_signup)
-        etPassword = view.findViewById(R.id.et_password_signup)
-        btnSignup = view.findViewById(R.id.btn_create_account)
-        etLayoutEmail = view.findViewById(R.id.et_layot_email_signup)
-        etLayoutName = view.findViewById(R.id.et_layout_name_signup)
-        etLayoutPassword = view.findViewById(R.id.et_layout_password_signup)
+        val etName = binding.etNameSignup
+        val etEmail = binding.etEmailSignup
+        val etPassword = binding.etPasswordSignup
+        val btnSignup = binding.btnCreateAccount
+        val etLayoutEmail = binding.etLayotEmailSignup
+        val etLayoutName = binding.layoutNameSignup
+        val etLayoutPassword = binding.etLayoutPasswordSignup
 
         btnSignup.setOnClickListener {
             val name = etName.text.toString()
@@ -99,7 +88,7 @@ class SignUpFragment : Fragment() {
                     true
                 }
             }
-            val validEmail = isValidmail()
+            val validEmail = isValidmail(email, etLayoutEmail)
 
 
             if (eEmail && ePass && eName && validEmail) {
@@ -129,10 +118,10 @@ class SignUpFragment : Fragment() {
         }
     }
 
-    private fun isValidmail(): Boolean {
+    private fun isValidmail(email: String, etLayoutEmail: TextInputLayout): Boolean {
         val emailPattern = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}\$")
         return when {
-            !etEmail.text.toString().trim().matches(emailPattern) -> {
+            !email.trim().matches(emailPattern) -> {
                 etLayoutEmail.error = "Email is not valid"
                 false
 
@@ -163,6 +152,11 @@ class SignUpFragment : Fragment() {
         }
 
         return null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        signUpFragmentBinding = null
     }
 
 }

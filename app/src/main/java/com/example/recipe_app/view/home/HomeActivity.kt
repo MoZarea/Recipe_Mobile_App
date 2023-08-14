@@ -12,6 +12,7 @@ import androidx.navigation.ui.AppBarConfiguration
 
 import androidx.navigation.ui.setupWithNavController
 import com.example.recipe_app.R
+import com.example.recipe_app.databinding.ActivityHomeBinding
 
 import com.example.recipe_app.view.auth.MainActivity
 
@@ -20,19 +21,18 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity(){
+    lateinit var binding: ActivityHomeBinding
     lateinit var navController: NavController
     lateinit var navHostFragment : NavHostFragment
-    lateinit var  bottomNavigationView : BottomNavigationView
-    lateinit var toolbar: Toolbar
+    private lateinit var toolbar: Toolbar
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        binding = ActivityHomeBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
         navController = navHostFragment.navController
         val appBarConfiguration = AppBarConfiguration(navController.graph)
-        toolbar = findViewById(R.id.toolbar)
-
+        toolbar = binding.include2.toolbar
         toolbar.setupWithNavController(navController, appBarConfiguration)
         toolbar.inflateMenu(R.menu.home_menu)
         toolbar.setOnMenuItemClickListener {
@@ -53,20 +53,20 @@ class HomeActivity : AppCompatActivity(){
             }
         }
 
-        bottomNavigationView.setupWithNavController(navController)
+        binding.bottomNavigationView.setupWithNavController(navController)
 
 
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             when (destination.id) {
                 R.id.detailsFragment -> {
-                    bottomNavigationView.visibility = BottomNavigationView.GONE
+                    binding.bottomNavigationView.visibility = BottomNavigationView.GONE
 
                 }
                 R.id.aboutFragment -> {
-                    bottomNavigationView.visibility = BottomNavigationView.GONE
+                    binding.bottomNavigationView.visibility = BottomNavigationView.GONE
                 }
                 else -> {
-                    bottomNavigationView.visibility = BottomNavigationView.VISIBLE
+                    binding.bottomNavigationView.visibility = BottomNavigationView.VISIBLE
                 }
 
             }

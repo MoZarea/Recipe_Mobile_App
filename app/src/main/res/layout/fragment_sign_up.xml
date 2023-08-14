@@ -29,7 +29,7 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/et_layout_name_signup"
+        android:id="@+id/layout_name_signup"
         style="@style/EditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
         app:endIconMode="custom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_layout_name_signup">
+        app:layout_constraintTop_toBottomOf="@+id/layout_name_signup">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_email_signup"

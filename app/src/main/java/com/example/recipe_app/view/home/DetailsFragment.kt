@@ -17,6 +17,7 @@ import androidx.navigation.fragment.navArgs
 import at.blogc.android.views.ExpandableTextView
 import com.bumptech.glide.Glide
 import com.example.recipe_app.R
+import com.example.recipe_app.databinding.FragmentDetailsBinding
 import com.example.recipe_app.utils.CurrentUser
 import com.example.recipe_app.utils.GreenSnackBar
 import com.example.recipe_app.utils.GreenSnackBar.showSnackBarLong
@@ -29,17 +30,10 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class DetailsFragment : Fragment()  {
-    private lateinit var mealImage : ImageView
-    private lateinit var mealName : TextView
-    private lateinit var mealDescription :ExpandableTextView
+    private var detailsFragmentBinding: FragmentDetailsBinding? = null
     lateinit var id :String
-    private lateinit var textToggle :TextView
-    private lateinit var mealArea :TextView
-    private lateinit var mealCategory :TextView
-    private lateinit var favState :CheckBox
     var videoId : String = ""
     private lateinit var  youtubeVideo : YouTubePlayerView
-    private lateinit var btnDisplayBottomSheet : Button
     private val args : DetailsFragmentArgs by navArgs()
     private val detailsViewModel : DetailsViewModel by viewModels()
 
@@ -52,31 +46,22 @@ class DetailsFragment : Fragment()  {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val binding = FragmentDetailsBinding.bind(view)
+        detailsFragmentBinding = binding
 
 
-        mealImage = view.findViewById(R.id.imageView2)
-        mealName = view.findViewById(R.id.textView2)
-        mealDescription = view.findViewById(R.id.textView3)
-        mealArea = view.findViewById(R.id.meal_area)
-        mealCategory = view.findViewById(R.id.meal_category)
-        btnDisplayBottomSheet = view.findViewById(R.id.btnBottomSheet)
-        favState = view.findViewById(R.id.fav_box_v3)
-
-
-        mealName.text = args.meal.strMeal
-        mealDescription.text = args.meal.strInstructions
-        Glide.with(this).load(args.meal.strMealThumb).into(mealImage)
+        binding.textView2.text = args.meal.strMeal
+        binding.textView3.text = args.meal.strInstructions
+        Glide.with(this).load(args.meal.strMealThumb).into(binding.imageView2)
         videoId = args.meal.strYoutube!!
-        mealArea.text = args.meal.strArea
-        mealCategory.text = args.meal.strCategory
-        favState.isChecked = args.meal.isFavourite
-
+        binding.mealArea.text = args.meal.strArea
+        binding.mealCategory.text = args.meal.strCategory
+        binding.favBoxV3.isChecked = args.meal.isFavourite
 
         val bottomSheetView = layoutInflater.inflate(R.layout.bottom_sheet, null)
-        btnDisplayBottomSheet.setOnClickListener {
+        binding.btnBottomSheet.setOnClickListener {
             val dialog = BottomSheetDialog(requireContext())
             val btnDismissBottomSheet: Button = bottomSheetView.findViewById(R.id.btnDismiss)
-
 
             btnDismissBottomSheet.setOnClickListener {
                 dialog.dismiss()
@@ -89,42 +74,35 @@ class DetailsFragment : Fragment()  {
             dialog.show()
         }
 
-
         youtubeVideo = bottomSheetView.findViewById(R.id.youtube_player_view)
         lifecycle.addObserver(youtubeVideo)
         youtubeVideo.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
             override fun onReady(@NonNull youTubePlayer: YouTubePlayer) {
-
-
                 val result = videoId.substringAfter("v=")
                 youTubePlayer.cueVideo(result, 0f)
-
             }
         })
 
-
-        textToggle = view.findViewById(R.id.textView8)
-        mealDescription.setAnimationDuration(750L)
-        mealDescription.setInterpolator(OvershootInterpolator())
-        textToggle.setOnClickListener {
-            if (mealDescription.isExpanded) {
-                mealDescription.collapse()
-                textToggle.setText(R.string.see_more)
+        binding.textView3.setAnimationDuration(750L)
+        binding.textView3.setInterpolator(OvershootInterpolator())
+        binding.textView8.setOnClickListener {
+            if (binding.textView3.isExpanded) {
+                binding.textView3.collapse()
+                binding.textView8.setText(R.string.see_more)
             } else {
-                mealDescription.expand()
-                textToggle.setText(R.string.see_less)
+                binding.textView3.expand()
+                binding.textView8.setText(R.string.see_less)
             }
         }
 
 
-        favState.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.favBoxV3.setOnCheckedChangeListener { buttonView, isChecked ->
 
             val userid=CurrentUser.getCurrentUser(requireActivity())
             if (isChecked)
             {
                 detailsViewModel.insertFavMealToUser(args.meal,userid)
                 showSnackBarLong(view,"Added to favourites")
-
             }
             else
             {
@@ -145,5 +123,8 @@ class DetailsFragment : Fragment()  {
         }
     }
 
-
+    override fun onDestroy() {
+        detailsFragmentBinding = null
+        super.onDestroy()
+    }
 }

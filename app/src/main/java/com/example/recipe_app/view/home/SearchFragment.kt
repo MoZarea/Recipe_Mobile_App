@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.example.recipe_app.R
+import com.example.recipe_app.databinding.FragmentSearchBinding
 import com.example.recipe_app.model.MealX
 import com.example.recipe_app.utils.CurrentUser
 import com.example.recipe_app.utils.GreenSnackBar
@@ -31,36 +32,26 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SearchFragment : Fragment() , OnClickListener {
-    lateinit var navController: NavController
-    lateinit var navHostFragment : NavHostFragment
-    lateinit var detailsViewModel: DetailsViewModel
+    private var searchFragmentBinding: FragmentSearchBinding? = null
     val searchViewModel: SearchViewModel by viewModels()
-    lateinit var searchView: SearchView
-    lateinit var recyclerView: RecyclerView
-    lateinit var recyclerAdapter: SearchAdapter
-    lateinit var text_NO_MEALS: TextView
-    lateinit var typeToSearchLayout:LinearLayout
-    lateinit var lootieNotFound :LottieAnimationView
-    lateinit var shimmerFrameLayout: ShimmerFrameLayout
-
-
+    private lateinit var recyclerAdapter: SearchAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_search, container, false)
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val binding=FragmentSearchBinding.bind(view)
+        searchFragmentBinding=binding
 
         var userid=CurrentUser.getCurrentUser(requireActivity())
-
-        searchView = view.findViewById(R.id.searchView)
-        recyclerView = view.findViewById(R.id.searchRecyclerView)
-        typeToSearchLayout = view.findViewById(R.id.lottie_type_to_search_layout)
-        lootieNotFound = view.findViewById(R.id.lottie_not_found)
-        shimmerFrameLayout = view.findViewById(R.id.shimmer_view_container_search)
+        val searchView = binding.searchView
+        val recyclerView = binding.searchRecyclerView
+        val typeToSearchLayout = binding.lottieTypeToSearchLayout
+        val lootieNotFound = binding.lottieNotFound
+        val shimmerFrameLayout = binding.shimmerViewContainerSearch
         recyclerAdapter = SearchAdapter(this)
         recyclerView.adapter = recyclerAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireActivity(), RecyclerView.VERTICAL, false)
@@ -76,25 +67,20 @@ class SearchFragment : Fragment() , OnClickListener {
                     typeToSearchLayout.visibility = View.GONE
                     lootieNotFound.visibility = View.VISIBLE
                     shimmerFrameLayout.visibility = View.GONE
-
                 }else{
                     recyclerView.visibility = View.VISIBLE
                     lootieNotFound.visibility = View.GONE
                     typeToSearchLayout.visibility = View.GONE
                     recyclerAdapter.setDataAdapter(meals)
                     shimmerFrameLayout.visibility = View.GONE
-
                 }
             }
-
-
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if(query.isNullOrEmpty()){
                     typeToSearchLayout.visibility = View.VISIBLE
                     recyclerView.visibility = View.GONE
                     lootieNotFound.visibility = View.GONE
-
                 }
                 else{
                     typeToSearchLayout.visibility = View.GONE
@@ -111,30 +97,25 @@ class SearchFragment : Fragment() , OnClickListener {
                     typeToSearchLayout.visibility = View.VISIBLE
                     recyclerView.visibility = View.GONE
                     lootieNotFound.visibility = View.GONE
-
                 }
                 else{
                     typeToSearchLayout.visibility = View.GONE
                     recyclerView.visibility = View.GONE
                     shimmerFrameLayout.visibility = View.VISIBLE
-
                     if(isInternetAvailable(requireActivity())) {
                         searchViewModel.getMealsWithFavourite(userid!!,newText!!)
                     }
                     else{
                         showSnackBarWithDismiss(view,"Internet disconnected")                 }
-
                 }
                 return false
             }
-
         })
     }
 
     override fun onClick(model: MealX) {
         findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToDetailsFragment(model))
     }
-
     override fun onFav(isChecked: Boolean, meal: MealX) {
         var userid=CurrentUser.getCurrentUser(requireActivity())
         if (isChecked)
@@ -162,19 +143,12 @@ class SearchFragment : Fragment() , OnClickListener {
             val dialog = builder.create()
             dialog.show()
         }
-
     }
-
     override fun onDestroy() {
         super.onDestroy()
         searchViewModel.resetList()
+        searchFragmentBinding=null
     }
-
-
-
-
-
-
 
 }
 
